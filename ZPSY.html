@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" />
+<title>WaterMark证件水印</title>
+<meta name="水印" http-equiv="Content-Type" content="WaterMark; charset=utf-8" />
+<style type="text/css">
+#waterMark {
+        border: 6px solid;
+        border-color: #686de0;
+        box-shadow: 10px 10px 5px #95afc0;
+}
+#fontSize {
+        width: 50px;
+}
+#srcPic {
+        border: 2px solid;
+        border-color: #686de0;
+}
+.btn{
+        border-radius: 25px;
+}
+</style>
+</head>
+<body>
+<h1 align="center">WaterMark</h1>
+<h2 align="center">给数码证件加上水印</h2>
+<div align="center">
+  <input type="file" id="srcPic" />
+  <p>水印文本
+  <input type="text" id="waterText" value="输入文本 他用无效">
+  </p>
+  <div>
+  <p>旋转角度
+  <input type="range" id="waterAngle" value ="20" min="0" max="360" >
+  </p>
+  <p>透明程度
+  <input type="range" id="waterAlpha" value ="0.3" min="0" max="1" step="0.1">
+  </p>
+  </div>
+  尺寸颜色
+  <input type="number" id="fontSize" value ="20">
+  <input type="color" id="waterColor" value ="#FFC125">
+</div>
+</br>
+<div align="center">
+  <button type="botton" id="btn-onload" onclick="Onload()" class="btn">加载图片</button>
+  <button type="button" id="btn-print" onclick="printWater()" class="btn"> 添加水印 </button>
+  <button type="button" id="btn-clear" onclick="clearPrint()" class="btn"> 清空画布 </button>
+  <a id="download" href="javascript:(function(){alert('图片未完成');})();" download="waterMarked"><button class="btn">保存图片</button></a>
+</div>
+<div align="center">
+  <canvas id="waterMark" width="320" height="240"></canvas>
+</div>
+  <script>
+    //获取元素访问
+        var waterImg=document.getElementById("waterMark");
+        var waterText = document.getElementById("waterText");
+        var fontSize = document.getElementById("fontSize");
+        var waterAngle=document.getElementById("waterAngle");
+        var waterAlpha=document.getElementById("waterAlpha");
+        var waterColor=document.getElementById("waterColor");
+        var srcPic=document.getElementById("srcPic");
+        var download=document.getElementById("download");
+        //获取画布访问
+        var ctx = waterImg.getContext("2d");
+       
+        function printWater() {       
+       
+                //获取水印属性
+                ctx.fillStyle = waterColor.value; //颜色
+                ctx.globalAlpha = waterAlpha.value; //透明度
+                ctx.font = `${fontSize.value}px Arial`; //字体
+       
+                angle = waterAngle.value*Math.PI/180; //旋转角度
+       
+                //获取画布大小
+                cvsHeight = waterImg.height*1.4;
+                cvsWidth = waterImg.width*1.4;
+                xGap = fontSize.value*waterText.value.length
+                yGap = fontSize.value*2
+               
+                //密铺水印
+                ctx.rotate(angle);
+                var x,y;
+                for(x=-cvsWidth;x<=cvsWidth;x+=(xGap)) {
+                for(y=-cvsHeight;y<=cvsHeight;y+=(yGap)) {
+                        ctx.fillText(waterText.value,x,y);
+                }}
+                ctx.rotate(-angle);
+                save();
+        }
+       
+        function clearPrint() {
+                ctx.clearRect(0, 0, waterImg.width, waterImg.height);
+        }
+       
+        function Onload() {
+                //将图片转为base64码进行加载
+        var imgFile = new FileReader();  
+        imgFile.readAsDataURL(srcPic.files[0]);  
+        imgFile.onload = function () {  
+        var img = new Image()
+                img.src = this.result;
+                img.onload = function(){
+                        waterImg.width=img.width;
+                        waterImg.height=img.height;
+                        ctx.drawImage(img,0,0);
+                }
+        }}
+       
+        function save() {
+                var finalResult = waterImg.toDataURL('waterMarked/png');
+                download.href=finalResult;
+        }
+  </script>
+</body>
+</html>
