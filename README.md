@@ -1,1 +1,1 @@
-centcyn.github.io/p/
+centcy.github.io/p
